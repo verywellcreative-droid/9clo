@@ -1,11 +1,8 @@
 [phases.setup]
-nixPkgs = ["python3", "gcc", "gnumake"]
+nixPkgs = ["python3", "gcc", "gnumake", "nodejs_20"]
 
 [phases.install]
-cmds = ["npm ci"]
-
-[phases.build]
-cmds = ["npm run seed || echo 'Seed skipped (DB exists)'"]
+cmds = ["npm install --build-from-source"]
 
 [start]
 cmd = "node server.js"
