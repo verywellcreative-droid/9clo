@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akun Saya — 9clo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/header.css">
+  <style>
+    .account-page { max-width:900px; margin:0 auto; padding:48px 24px; }
+    .greeting { font-size:1.8rem; font-weight:800; color:var(--white); margin-bottom:4px; }
+    .greeting span { color:var(--accent); }
+    .account-grid { display:grid; grid-template-columns:220px 1fr; gap:24px; margin-top:32px; }
+    .account-nav { background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; padding:8px; height:fit-content; }
+    .acc-nav-btn { display:flex; align-items:center; gap:10px; width:100%; padding:11px 14px; background:none; border:none; border-radius:8px; color:var(--text-secondary); font-size:.85rem; font-weight:500; font-family:var(--font-main); cursor:pointer; transition:all .2s; text-align:left; }
+    .acc-nav-btn:hover, .acc-nav-btn.active { background:rgba(255,255,255,.06); color:var(--white); }
+    .acc-nav-btn.active { color:var(--accent); }
+    .panel { background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; padding:28px; display:none; }
+    .panel.active { display:block; }
+    .panel-title { font-size:1rem; font-weight:700; color:var(--white); margin-bottom:20px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group.full { grid-column:1/-1; }
+    .form-label { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); }
+    .form-input { padding:11px 14px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:7px; color:var(--white); font-size:.88rem; font-family:var(--font-main); outline:none; transition:border-color .2s; }
+    .form-input:focus { border-color:var(--accent); }
+    .save-btn { padding:11px 24px; background:var(--accent); color:#fff; border:none; border-radius:7px; font-size:.82rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; cursor:pointer; font-family:var(--font-main); transition:opacity .2s; }
+    .save-btn:hover { opacity:.85; }
+
+    /* Orders */
+    .order-item { border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:12px; }
+    .order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .order-num { font-family:monospace; font-size:.82rem; color:var(--text-muted); }
+    .status-pill { padding:4px 12px; border-radius:99px; font-size:.68rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+    .status-pill.pending    { background:rgba(255,149,0,.15); color:#ff9500; }
+    .status-pill.processing { background:rgba(10,132,255,.15); color:#0a84ff; }
+    .status-pill.shipped    { background:rgba(0,200,81,.1); color:#00aa44; }
+    .status-pill.delivered  { background:rgba(0,200,81,.2); color:#00c851; }
+    .status-pill.cancelled  { background:rgba(255,59,48,.12); color:#ff3b30; }
+    .order-products { font-size:.83rem; color:var(--text-secondary); }
+    .order-total { font-weight:700; color:var(--white); margin-top:6px; }
+
+    .toast { position:fixed; bottom:24px; right:24px; background:var(--bg-surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; padding:12px 20px; font-size:.85rem; color:var(--white); box-shadow:var(--shadow-lg); display:none; z-index:9999; }
+
+    @media (max-width: 640px) {
+      .account-grid { grid-template-columns:1fr; }
+      .form-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" style="position:sticky;top:0;z-index:200;background:rgba(10,10,10,.97);border-bottom:1px solid var(--border);height:64px">
+    <div style="max-width:var(--max-w);margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between">
+      <a href="/index.html" style="font-size:1.5rem;font-weight:900;letter-spacing:-.04em;color:var(--white);text-decoration:none">9<span style="color:var(--accent)">clo</span></a>
+      <div style="display:flex;gap:20px;font-size:.82rem">
+        <a href="/shop.html" style="color:var(--text-secondary);text-decoration:none">Shop</a>
+        <a href="/cart.html" style="color:var(--text-secondary);text-decoration:none">Keranjang</a>
+        <button onclick="doLogout()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:.82rem;font-family:inherit">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="account-page">
+    <div class="greeting">Hei, <span id="user-name">...</span> 👋</div>
+    <div style="font-size:.82rem;color:var(--text-muted)" id="user-meta">Loading...</div>
+
+    <div class="account-grid">
+      <nav class="account-nav">
+        <button class="acc-nav-btn active" onclick="showTab('orders',this)">📦 Pesanan Saya</button>
+        <button class="acc-nav-btn" onclick="showTab('profile',this)">👤 Profil Saya</button>
+        <button class="acc-nav-btn" onclick="showTab('addresses',this)">📍 Alamat</button>
+        <button class="acc-nav-btn" onclick="showTab('security',this)">🔒 Keamanan</button>
+        <button class="acc-nav-btn" style="color:var(--red);margin-top:8px" onclick="doLogout()">🚪 Logout</button>
+      </nav>
+
+      <!-- Orders -->
+      <div class="panel active" id="tab-orders">
+        <div class="panel-title">Pesanan Saya</div>
+        <div id="orders-list"><div style="color:var(--text-muted);font-size:.9rem">Loading...</div></div>
+      </div>
+
+      <!-- Profile -->
+      <div class="panel" id="tab-profile">
+        <div class="panel-title">Edit Profil</div>
+        <form id="profile-form">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="p-name" placeholder="Nama lengkap"></div>
+            <div class="form-group"><label class="form-label">No. Telepon</label><input class="form-input" id="p-phone" placeholder="08123456789"></div>
+          </div>
+          <div class="form-group full" style="margin-bottom:20px"><label class="form-label">Email</label><input class="form-input" id="p-email" disabled></div>
+          <button type="submit" class="save-btn">Simpan Perubahan</button>
+        </form>
+      </div>
+
+      <!-- Addresses -->
+      <div class="panel" id="tab-addresses">
+        <div class="panel-title">Alamat Pengiriman</div>
+        <div id="addresses-list" style="margin-bottom:20px"></div>
+        <form id="addr-form" style="border:1px solid var(--border);border-radius:10px;padding:20px">
+          <div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:14px">+ Tambah Alamat</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Label</label><input class="form-input" id="a-label" placeholder="Rumah / Kantor" value="Rumah"></div>
+            <div class="form-group"><label class="form-label">Nama Penerima</label><input class="form-input" id="a-name" placeholder="Nama lengkap" required></div>
+            <div class="form-group"><label class="form-label">Telepon</label><input class="form-input" id="a-phone" placeholder="08xxx"></div>
+            <div class="form-group"><label class="form-label">Kota</label><input class="form-input" id="a-city" placeholder="Jakarta"></div>
+            <div class="form-group"><label class="form-label">Provinsi</label><input class="form-input" id="a-province" placeholder="DKI Jakarta"></div>
+            <div class="form-group"><label class="form-label">Kode Pos</label><input class="form-input" id="a-postal" placeholder="12345"></div>
+            <div class="form-group full"><label class="form-label">Alamat Lengkap</label><input class="form-input" id="a-addr" placeholder="Jl. ... No. ..., RT/RW ..." required></div>
+          </div>
+          <button type="submit" class="save-btn">Simpan Alamat</button>
+        </form>
+      </div>
+
+      <!-- Security -->
+      <div class="panel" id="tab-security">
+        <div class="panel-title">Ubah Password</div>
+        <form id="sec-form">
+          <div class="form-group" style="margin-bottom:14px"><label class="form-label">Password Lama</label><input type="password" class="form-input" id="s-old" placeholder="Password saat ini" style="max-width:360px"></div>
+          <div class="form-group" style="margin-bottom:14px"><label class="form-label">Password Baru</label><input type="password" class="form-input" id="s-new" placeholder="Min. 8 karakter" minlength="8" style="max-width:360px"></div>
+          <div class="form-group" style="margin-bottom:20px"><label class="form-label">Konfirmasi Password Baru</label><input type="password" class="form-input" id="s-new2" placeholder="Ulangi password baru" style="max-width:360px"></div>
+          <button type="submit" class="save-btn">Ubah Password</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let userData = null;
+
+    function showTab(name, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.acc-nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${name}`).classList.add('active');
+      if (btn) btn.classList.add('active');
+      if (name === 'addresses') loadAddresses();
+    }
+
+    function toast(msg, ok=true) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.borderLeftColor = ok ? 'var(--accent)' : 'var(--red)';
+      t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    async function init() {
+      try {
+        const r = await fetch('/api/auth/me', { credentials: 'same-origin' });
+        const d = await r.json();
+        if (!d.success) return window.location.href = '/login.html?return=/my-account.html';
+        userData = d.data;
+        document.getElementById('user-name').textContent = d.data.name.split(' ')[0];
+        document.getElementById('user-meta').textContent = `${d.data.email} · ${d.data.orderCount} pesanan`;
+        document.getElementById('p-name').value  = d.data.name;
+        document.getElementById('p-phone').value = d.data.phone || '';
+        document.getElementById('p-email').value = d.data.email;
+        loadOrders();
+        if (new URLSearchParams(location.search).get('welcome') === '1') toast('🎉 Selamat datang di 9clo!');
+      } catch { window.location.href = '/login.html'; }
+    }
+
+    async function loadOrders() {
+      const r = await fetch('/api/auth/my-orders', { credentials: 'same-origin' });
+      const d = await r.json(); const el = document.getElementById('orders-list');
+      if (!d.success || !d.data.length) { el.innerHTML = '<div style="color:var(--text-muted);padding:24px 0;text-align:center">Belum ada pesanan. <a href="/shop.html" style="color:var(--accent)">Yuk belanja!</a></div>'; return; }
+      el.innerHTML = d.data.map(o => `
+        <div class="order-item">
+          <div class="order-header">
+            <div><span class="order-num">${o.order_number}</span> <span style="font-size:.75rem;color:var(--text-muted)">${new Date(o.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</span></div>
+            <span class="status-pill ${o.status}">${o.status}</span>
+          </div>
+          <div class="order-products">${(o.items||[]).map(i=>`${i.qty}× ${i.product?.name||'?'} (${i.size})`).join(' • ')}</div>
+          <div class="order-total">Total: Rp${(o.total||0).toLocaleString('id')}</div>
+        </div>`).join('');
+    }
+
+    async function loadAddresses() {
+      const r = await fetch('/api/auth/addresses', { credentials: 'same-origin' });
+      const d = await r.json(); const el = document.getElementById('addresses-list');
+      if (!d.success || !d.data.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:.85rem">Belum ada alamat tersimpan.</div>'; return; }
+      el.innerHTML = d.data.map(a => `
+        <div style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:start">
+          <div>
+            <div style="font-weight:700;font-size:.88rem">${a.label} ${a.is_default?'<span style="color:var(--accent);font-size:.7rem">• Utama</span>':''}</div>
+            <div style="font-size:.83rem;color:var(--text-secondary);margin-top:3px">${a.recipient_name} · ${a.phone||''}</div>
+            <div style="font-size:.82rem;color:var(--text-muted)">${a.address}${a.city?', '+a.city:''}${a.province?', '+a.province:''} ${a.postal_code||''}</div>
+          </div>
+          <button onclick="deleteAddr(${a.id})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.8rem;white-space:nowrap">Hapus</button>
+        </div>`).join('');
+    }
+
+    async function deleteAddr(id) {
+      await fetch(`/api/auth/addresses/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+      toast('Alamat dihapus.'); loadAddresses();
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const r = await fetch('/api/auth/me', {
+        method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: document.getElementById('p-name').value, phone: document.getElementById('p-phone').value })
+      });
+      const d = await r.json();
+      toast(d.success ? 'Profil diperbarui!' : d.error, d.success);
+    });
+
+    document.getElementById('sec-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (document.getElementById('s-new').value !== document.getElementById('s-new2').value)
+        return toast('Konfirmasi password tidak cocok.', false);
+      const r = await fetch('/api/auth/me', {
+        method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: document.getElementById('s-old').value, newPassword: document.getElementById('s-new').value })
+      });
+      const d = await r.json();
+      toast(d.success ? '🔒 Password berhasil diubah!' : d.error, d.success);
+      if (d.success) document.getElementById('sec-form').reset();
+    });
+
+    document.getElementById('addr-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const r = await fetch('/api/auth/addresses', {
+        method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          label: document.getElementById('a-label').value || 'Rumah',
+          recipient_name: document.getElementById('a-name').value,
+          phone: document.getElementById('a-phone').value,
+          address: document.getElementById('a-addr').value,
+          city: document.getElementById('a-city').value,
+          province: document.getElementById('a-province').value,
+          postal_code: document.getElementById('a-postal').value
+        })
+      });
+      const d = await r.json();
+      if (d.success) { toast('Alamat disimpan!'); document.getElementById('addr-form').reset(); loadAddresses(); }
+      else toast(d.error, false);
+    });
+
+    async function doLogout() {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+      window.location.href = '/index.html';
+    }
+
+    init();
+  </script>
+</body>
+</html>

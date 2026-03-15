@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembayaran Gagal — 9clo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-main); }
+    .result-card { text-align: center; max-width: 460px; padding: 0 24px; }
+    .result-icon { font-size: 4rem; margin-bottom: 20px; animation: pop .5s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .result-title { font-size: 2rem; font-weight: 900; color: #ff3b30; margin-bottom: 8px; }
+    .result-sub { color: var(--text-muted); margin-bottom: 24px; font-size: .95rem; line-height: 1.6; }
+    .tips { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 28px; text-align: left; }
+    .tips-title { font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    .tips ul { list-style: none; }
+    .tips ul li { font-size: .84rem; color: var(--text-secondary); padding: 4px 0; }
+    .tips ul li::before { content: '→ '; color: var(--accent); }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-retry { padding: 13px 28px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: .88rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-outline { padding: 13px 28px; background: none; color: var(--text-secondary); border: 1px solid var(--border); border-radius: 8px; font-size: .88rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-outline:hover { border-color: var(--accent); color: var(--white); }
+  </style>
+</head>
+<body>
+  <div class="result-card">
+    <div class="result-icon">❌</div>
+    <div class="result-title">Pembayaran Gagal</div>
+    <div class="result-sub">Pesananmu belum berhasil dibayar. Jangan khawatir — keranjangmu masih tersimpan.</div>
+
+    <div class="tips">
+      <div class="tips-title">Kemungkinan penyebab:</div>
+      <ul>
+        <li>Saldo / limit kartu tidak mencukupi</li>
+        <li>Transaksi ditolak oleh bank</li>
+        <li>Waktu pembayaran habis (expired)</li>
+        <li>Koneksi internet terputus</li>
+      </ul>
+    </div>
+
+    <div class="btn-group">
+      <a href="/cart.html" class="btn-retry">🔄 Coba Lagi</a>
+      <a href="/shop.html" class="btn-outline">← Kembali ke Toko</a>
+    </div>
+
+    <p style="margin-top:20px;font-size:.78rem;color:var(--text-muted)">
+      Butuh bantuan? <a href="/contact.html" style="color:var(--accent)">Hubungi CS kami</a>
+    </p>
+  </div>
+</body>
+</html>
